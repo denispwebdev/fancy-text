@@ -41,9 +41,9 @@ export default function FancyText() {
     function getScaledOptions() {
       return {
         strings: displayText,
-        charSize: Math.min(40, Math.max(20, w / 30)), // Responsive font size
-        charSpacing: Math.min(45, Math.max(25, w / 25)),
-        lineHeight: Math.min(50, Math.max(30, w / 25)),
+        charSize: Math.max(30, w / 30),
+        charSpacing: Math.max(30, w / 25),
+        lineHeight: Math.max(40, w / 25),
 
         cx: w / 2,
         cy: h / 2,
