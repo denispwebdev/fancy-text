@@ -24,7 +24,7 @@ function generateBalloonPath(
 export default function FancyText() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [userText, setUserText] = useState("");
-  const [displayText, setDisplayText] = useState(["KUL", "ŽURKA"]);
+  const [displayText, setDisplayText] = useState(["GLOW", "CELEBRATE"]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,9 +41,9 @@ export default function FancyText() {
     function getScaledOptions() {
       return {
         strings: displayText,
-        charSize: 30,
-        charSpacing: 35,
-        lineHeight: 40,
+        charSize: Math.min(40, Math.max(20, w / 30)), // Responsive font size
+        charSpacing: Math.min(45, Math.max(25, w / 25)),
+        lineHeight: Math.min(50, Math.max(30, w / 25)),
 
         cx: w / 2,
         cy: h / 2,
@@ -84,7 +84,7 @@ export default function FancyText() {
 
     let opts = getScaledOptions();
 
-    ctx.font = opts.charSize + "px Verdana";
+    ctx.font = `bold ${opts.charSize}px 'Arial', sans-serif`;
 
     const calc = {
       totalWidth:
@@ -96,6 +96,49 @@ export default function FancyText() {
     const TauQuarter = Tau / 4;
 
     type Point = [number, number, number?];
+
+    // Enhanced glow drawing function
+    function drawGlowText(
+      ctx: CanvasRenderingContext2D,
+      text: string,
+      x: number,
+      y: number,
+      color: string,
+      glowColor: string,
+      glowRadius: number = 20
+    ) {
+      // Save the current context state
+      ctx.save();
+
+      // Create multiple glow layers for enhanced effect
+      const glowLayers = [
+        { blur: glowRadius * 1.5, alpha: 0.1 },
+        { blur: glowRadius, alpha: 0.3 },
+        { blur: glowRadius * 0.5, alpha: 0.5 },
+        { blur: glowRadius * 0.25, alpha: 0.7 },
+      ];
+
+      // Draw glow layers
+      glowLayers.forEach((layer) => {
+        ctx.save();
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = layer.blur;
+        ctx.globalAlpha = layer.alpha;
+        ctx.fillStyle = glowColor;
+        ctx.fillText(text, x, y);
+        ctx.restore();
+      });
+
+      // Draw the main text
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = glowRadius * 0.3;
+      ctx.fillText(text, x, y);
+      ctx.restore();
+
+      ctx.restore();
+    }
 
     class Shard {
       x: number;
@@ -164,6 +207,7 @@ export default function FancyText() {
       dy: number;
       fireworkDy: number;
       color: string;
+      glowColor: string;
       lightAlphaColor: string;
       lightColor: string;
       alphaColor: string;
@@ -211,10 +255,11 @@ export default function FancyText() {
 
         const hue = (x / calc.totalWidth) * 360;
 
-        this.color = `hsl(${hue},80%,50%)`;
-        this.lightAlphaColor = `hsla(${hue},80%,light%,alp)`;
-        this.lightColor = `hsl(${hue},80%,light%)`;
-        this.alphaColor = `hsla(${hue},80%,50%,alp)`;
+        this.color = `hsl(${hue},90%,70%)`;
+        this.glowColor = `hsl(${hue},100%,85%)`;
+        this.lightAlphaColor = `hsla(${hue},90%,light%,alp)`;
+        this.lightColor = `hsl(${hue},90%,light%)`;
+        this.alphaColor = `hsla(${hue},90%,70%,alp)`;
 
         this.phase = "firework";
         this.tick = 0;
@@ -355,8 +400,16 @@ export default function FancyText() {
               this.circleFading = true;
             }
           } else if (this.circleFading) {
-            ctx.fillStyle = this.lightColor.replace("light", "70");
-            ctx.fillText(this.char, this.x + this.dx, this.y + this.dy);
+            // Enhanced glow text rendering
+            drawGlowText(
+              ctx,
+              this.char,
+              this.x + this.dx,
+              this.y + this.dy,
+              this.lightColor.replace("light", "80"),
+              this.glowColor,
+              15
+            );
 
             this.tick2++;
             const proportion = this.tick2 / this.circleFadeTime;
@@ -371,8 +424,16 @@ export default function FancyText() {
 
             if (this.tick2 >= this.circleFadeTime) this.circleFading = false;
           } else {
-            ctx.fillStyle = this.lightColor.replace("light", "70");
-            ctx.fillText(this.char, this.x + this.dx, this.y + this.dy);
+            // Enhanced glow text rendering for contemplation phase
+            drawGlowText(
+              ctx,
+              this.char,
+              this.x + this.dx,
+              this.y + this.dy,
+              this.lightColor.replace("light", "85"),
+              this.glowColor,
+              20
+            );
           }
 
           for (let i = 0; i < this.shards.length; i++) {
@@ -410,8 +471,16 @@ export default function FancyText() {
 
           if (this.spawning) {
             this.tick++;
-            ctx.fillStyle = this.lightColor.replace("light", "70");
-            ctx.fillText(this.char, this.x + this.dx, this.y + this.dy);
+            // Enhanced glow text for spawning phase
+            drawGlowText(
+              ctx,
+              this.char,
+              this.x + this.dx,
+              this.y + this.dy,
+              this.lightColor.replace("light", "80"),
+              this.glowColor,
+              12
+            );
 
             if (this.tick >= this.spawnTime) {
               this.tick = 0;
@@ -437,8 +506,16 @@ export default function FancyText() {
             ctx.lineTo(x, this.y);
             ctx.stroke();
 
-            ctx.fillStyle = this.lightColor.replace("light", "70");
-            ctx.fillText(this.char, this.x + this.dx, this.y + this.dy);
+            // Enhanced glow text for inflating phase
+            drawGlowText(
+              ctx,
+              this.char,
+              this.x + this.dx,
+              this.y + this.dy,
+              this.lightColor.replace("light", "80"),
+              this.glowColor,
+              10
+            );
 
             if (this.tick >= this.inflateTime) {
               this.tick = 0;
@@ -458,11 +535,15 @@ export default function FancyText() {
             ctx.lineTo(this.cx, this.cy + this.size);
             ctx.stroke();
 
-            ctx.fillStyle = this.lightColor.replace("light", "70");
-            ctx.fillText(
+            // Enhanced glow text for floating phase
+            drawGlowText(
+              ctx,
               this.char,
               this.cx + this.dx,
-              this.cy + this.dy + this.size
+              this.cy + this.dy + this.size,
+              this.lightColor.replace("light", "85"),
+              this.glowColor,
+              15
             );
 
             if (this.cy + this.size < -hh || this.cx < -hw || this.cy > hw) {
@@ -485,12 +566,25 @@ export default function FancyText() {
             1 - timeAlive / 120 - this.fallY / (h * 0.6)
           );
 
-          // Draw falling letter with fading opacity
-          ctx.fillStyle = this.lightColor
+          // Enhanced glow text for falling phase with fading
+          const fallColor = this.lightColor
             .replace("light", "70")
             .replace(")", `,${this.fallOpacity})`)
             .replace("hsl", "hsla");
-          ctx.fillText(this.char, this.fallX + this.dx, this.fallY + this.dy);
+
+          const fallGlowColor = this.glowColor
+            .replace(")", `,${this.fallOpacity * 0.7})`)
+            .replace("hsl", "hsla");
+
+          drawGlowText(
+            ctx,
+            this.char,
+            this.fallX + this.dx,
+            this.fallY + this.dy,
+            fallColor,
+            fallGlowColor,
+            8 * this.fallOpacity
+          );
 
           this.tick++;
 
@@ -760,7 +854,12 @@ export default function FancyText() {
     function anim() {
       window.requestAnimationFrame(anim);
 
-      ctx!.fillStyle = "#111";
+      // Dark gradient background for better glow visibility
+      const gradient = ctx!.createLinearGradient(0, 0, w, h);
+      gradient.addColorStop(0, "#000");
+      gradient.addColorStop(1, "#1f1f1f");
+
+      ctx!.fillStyle = gradient;
       ctx!.fillRect(0, 0, w, h);
 
       ctx!.save();
@@ -821,7 +920,7 @@ export default function FancyText() {
       hh = h / 2;
 
       opts = getScaledOptions();
-      ctx.font = opts.charSize + "px Verdana";
+      ctx.font = `bold ${opts.charSize}px 'Arial', sans-serif`;
 
       letters = createLetters(); // regenerate positions
     };
