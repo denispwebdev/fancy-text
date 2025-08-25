@@ -1,0 +1,79 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/*----- Fancy Text Wrapper -----*/
+.fancy-text-wrapper {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/*----- Fancy Text Canvas -----*/
+.fancy-text {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.input {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  gap: 10px;
+  max-width: 480px;
+}
+
+.input input {
+  width: 100%;
+  height: auto;
+  outline: none;
+  color: #fff;
+  font-size: 16px;
+  line-height: 16px;
+  padding: 0px 12px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 2px solid rgba(250, 250, 250, 0.1);
+  height: 48px;
+}
+
+input::placeholder {
+  color: #fff;
+  opacity: 0.6;
+}
+
+.input button {
+  width: auto;
+  height: auto;
+  font-size: 16px;
+  line-height: 16px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border-radius: 8px;
+  border: 2px solid rgba(250, 250, 250, 0.1);
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
