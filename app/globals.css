@@ -17,6 +17,12 @@ body {
   position: relative;
 }
 
+@supports (height: 100svh) {
+  .fancy-text-wrapper {
+    height: 100svh;
+  }
+}
+
 /*----- Fancy Text Canvas -----*/
 .fancy-text {
   position: fixed;
